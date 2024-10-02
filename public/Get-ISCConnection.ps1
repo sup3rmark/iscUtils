@@ -19,11 +19,12 @@ Function Get-ISCConnection {
     TokenExpiration : 01/01/2019 3:42:30 PM
     Environment     : foo
     Token           : [token]
-    v2URL           : https://instance.api.identitynow.com/v2
+    Domain          : Default
     v3URL           : https://instance.api.identitynow.com
 
 .LINK
-    
+    https://github.com/sup3rmark/iscUtils
+
 #>
 
     [CmdletBinding()]
@@ -37,8 +38,8 @@ Function Get-ISCConnection {
     $connectionObject | Add-Member -Type NoteProperty -Name 'Timestamp' -Value $script:iscConnectionTimestamp
     $connectionObject | Add-Member -Type NoteProperty -Name 'TokenExpiration' -Value $script:iscConnectionExpiration
     $connectionObject | Add-Member -Type NoteProperty -Name 'Tenant' -Value $script:iscTenant
+    $connectionObject | Add-Member -Type NoteProperty -Name 'Domain' -Value $script:iscDomain
     $connectionObject | Add-Member -Type NoteProperty -Name 'Token' -Value $script:iscOauthToken.access_token
-    $connectionObject | Add-Member -Type NoteProperty -Name 'v2URL' -Value $script:iscV2APIurl
     $connectionObject | Add-Member -Type NoteProperty -Name 'v3URL' -Value $script:iscV3APIurl
     if ($IncludeSources.IsPresent) {
         $connectionObject | Add-Member -Type NoteProperty -Name 'SourceList' -Value $script:iscSources

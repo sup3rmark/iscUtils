@@ -20,7 +20,8 @@ Function Get-ISCTransform {
     PS> Get-ISCTransform -All
 
 .LINK
-    https://github.csnzoo.com/shared/pwsh-iscUtils
+    https://github.com/sup3rmark/iscUtils
+
 #>
     [CmdletBinding()]
     param(

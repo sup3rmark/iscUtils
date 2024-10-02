@@ -37,6 +37,8 @@ DYNAMIC PARAMETERS
     PS> Get-ISCEntitlement -Name testEntitlement | Set-ISCEntitlement -Privileged $false
 
 .LINK
+    https://github.com/sup3rmark/iscUtils
+
 #>
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
@@ -92,7 +94,7 @@ DYNAMIC PARAMETERS
     process {
         $spUserParam = @{}
         $spUserParam = $(if ($OwnerEmployeeNumber) {
-                @{EmID = "$OwnerEmployeeNumber" }
+                @{EmployeeNumber = "$OwnerEmployeeNumber" }
             }
             elseif ($OwnerSamAccountName) {
                 @{SamAccountName = "$OwnerSamAccountName" }
@@ -114,7 +116,7 @@ DYNAMIC PARAMETERS
         if ($DisplayName -and ($DisplayName -ne $existingEntitlement.name)) { $changes += @{ op = 'replace'; path = '/name'; value = "$DisplayName" } }
         if ($Description -and ($Description -ne $existingEntitlement.description)) { $changes += @{ op = 'replace'; path = '/description'; value = "$Description" } }
         if ($OwnerID -and ($OwnerID -ne $existingEntitlement.owner.id)) { $changes += @{ op = 'replace'; path = '/owner'; value = @{ id = $OwnerID; type = 'IDENTITY' } } }
-        if ($Privileged -and ($Privileged -ne $existingEntitlement.privileged)) { $changes += @{ op = 'replace'; path = '/enabled'; value = $Privileged } }
+        if ($Privileged -and ($Privileged -ne $existingEntitlement.privileged)) { $changes += @{ op = 'replace'; path = '/privileged'; value = $Privileged } }
         if ($Requestable -and ($Requestable -ne $existingEntitlement.requestable)) { $changes += @{ op = 'replace'; path = '/requestable'; value = $Requestable } }
 
         if ($RemoveOwner) { $changes += @{ op = 'remove'; path = '/owner' } }

@@ -18,7 +18,8 @@ Function Test-ISCConnection {
     PS> Test-ISCConnection
 
 .LINK
-    https://github.csnzoo.com/shared/pwsh-iscUtils
+    https://github.com/sup3rmark/iscUtils
+
 #>
     [CmdletBinding()]
     param(
@@ -31,14 +32,14 @@ Function Test-ISCConnection {
     
     # If the connection is older than the default expiration time, and $ReconnectAutomatically isn't flagged, abort
     if (-NOT $spConnection.Timestamp) {
-        throw 'ERROR: Connection to Identity Security Cloud has not been established. You must first connect manually using Connect-ISCAPI.'
+        throw 'ERROR: Connection to Identity Security Cloud has not been established. You must first connect manually using Connect-ISC.'
     }
 
     if ($spConnection.TokenExpiration -lt $(Get-Date) -AND -NOT $ReconnectAutomatically) {
-        throw 'ERROR: Connection is likely expired. Either reconnect manually using Connect-ISCAPI or use -ReconnectAutomatically flag.'
+        throw 'ERROR: Connection is likely expired. Either reconnect manually using Connect-ISC or use -ReconnectAutomatically flag.'
     }
     elseif ($spConnection.TokenExpiration -lt $(Get-Date) -AND $ReconnectAutomatically) {
-        Connect-ISCAPI -Tenant $spConnection.Tenant
+        Connect-ISC -Tenant $spConnection.Tenant -Domain $spConnection.Domain
         Write-Verbose 'INFO: Connection is likely expired. Reconnecting automatically.'
         Return $(Get-ISCConnection)
     }

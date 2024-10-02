@@ -27,7 +27,8 @@ Function Get-ISCAccessProfile {
     PS> Get-ISCAccessProfile -ID "2cXXXXXXXXXXXXXXXXXXXXXXXXXXXX50"
 
 .LINK
-    
+    https://github.com/sup3rmark/iscUtils
+
 #>
     [CmdletBinding()]
     param(

@@ -20,7 +20,8 @@ Function Get-ISCConnectorRule {
     PS> Get-ISCConnectorRule -All
 
 .LINK
-    
+    https://github.com/sup3rmark/iscUtils
+
 #>
     [CmdletBinding()]
     param(

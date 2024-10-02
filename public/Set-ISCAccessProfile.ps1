@@ -31,7 +31,8 @@ DYNAMIC PARAMETERS
     PS> Get-ISCAccessProfile -Name testProfile | Set-ISCAccessProfile -OwnerEmID 2798
 
 .LINK
-    https://github.csnzoo.com/shared/pwsh-iscUtils
+    https://github.com/sup3rmark/iscUtils
+
 #>
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
