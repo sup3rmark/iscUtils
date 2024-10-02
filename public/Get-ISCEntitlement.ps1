@@ -16,7 +16,8 @@ Function Get-ISCEntitlement {
     PS> Get-ISCEntitlement -ID 2cXXXXXXXXXXXXXXXXXXXXXXXXXXXX50
 
 .LINK
-    
+    https://github.com/sup3rmark/iscUtils
+
 #>
     [CmdletBinding()]
     param(

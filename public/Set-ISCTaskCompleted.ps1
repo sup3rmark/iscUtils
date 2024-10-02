@@ -17,6 +17,8 @@ Function Set-ISCTaskCompleted {
     PS> Set-ISCTaskCompleted -ID 2xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx4
 
 .LINK
+    https://github.com/sup3rmark/iscUtils
+
 #>
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(

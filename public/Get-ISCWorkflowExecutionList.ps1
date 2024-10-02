@@ -16,6 +16,8 @@ Function Get-ISCWorkflowExecutionList {
     PS> Get-ISCWorkflowExecutionList -ID 5xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxd
 
 .LINK
+    https://github.com/sup3rmark/iscUtils
+
 #>
     [CmdletBinding()]
     param(

@@ -15,6 +15,12 @@ Function Connect-ISC {
 
 .EXAMPLE
     PS> Connect-ISC -Environment foo
+
+.EXAMPLE
+    PS> Connect-ISC -Environment bar -Domain Demo
+
+.EXAMPLE
+    PS> Connect-ISC -Environment baz -Domain FedRamp
     
 .EXAMPLE
     PS> Connect-ISC -Tenant foo -Verbose
@@ -29,26 +35,30 @@ Function Connect-ISC {
     23456  Non SSO Users                      Users who can bypass SSO
 
 .LINK
-    
+    https://github.com/sup3rmark/iscUtils
+
 #>
 
     [CmdletBinding()]
     param(
         # Define the tenant to which you want to connect.
         [Alias('Environment')]
+        [Parameter (Mandatory = $true)]
         [ValidateNotNullOrWhiteSpace()]
         [String] $Tenant,
 
         # Specify which domain the tenant is in.
+        [Parameter (Mandatory = $false)]
         [ValidateSet('Default', 'Demo', 'FedRamp')]
         [String] $Domain = 'Default'
     )
 
     $script:iscTenant = $Tenant
     Write-Verbose '================================================================='
-    Write-Verbose "Connecting to $Tenant Identity Security Cloud $(if ($Domain -ne 'Default') {"$Domain "}) Environment!"
+    Write-Verbose "Connecting to $Tenant Identity Security Cloud $(if ($Domain -ne 'Default') {"$Domain "})Environment!"
     Write-Verbose '================================================================='
 
+    $script:iscDomain = $Domain
     $script:iscV3APIurl = switch ($Domain) {
         'Default' { "https://$script:iscTenant.api.identitynow.com" }
         'Demo' { "https://$script:iscTenant.api.identitynow-demo.com" }
@@ -63,27 +73,21 @@ Function Connect-ISC {
     catch {
         throw "Failed to retrieve ISC credentials from the PowerShell Secret Store. Exception: $($_.Exception.Message)"
     }
-    $script:iscBase64APIkey = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes("$($script:iscClientID):$($script:iscClientSecret)"))
-    $script:basicAuthHeader = @{Authorization = "Basic $script:iscBase64APIkey" }
-    $script:cType = 'application/json;charset=utf-8'
-    $script:basicAuthArgs = @{
-        Headers     = $script:basicAuthHeader
-        ContentType = $script:cType
-        ErrorAction = 'Stop'
-    }
 
     try {
-        $oauthURLParams = @(
-            'grant_type=client_credentials'
-            "client_id=$script:iscClientID"
-            "client_secret=$script:iscClientSecret"
-        )
+        $oauthBody = @{
+            grant_type    = 'client_credentials'
+            client_id     = "$script:iscClientID"
+            client_secret = "$script:iscClientSecret"
+        }
         $oauthTokenArgs = @{
-            Uri    = "$script:iscV3APIurl/oauth/token?$($oauthURLParams -join '&')"
-            Method = 'Post'
+            Uri         = "$script:iscV3APIurl/oauth/token"
+            Form        = $oauthBody
+            Method      = 'Post'
+            ContentType = 'application/x-www-form-urlencoded'
         }
         Write-Verbose "URL: $($oauthTokenArgs.URI)"
-        $script:iscOauthToken = Invoke-RestMethod @oauthTokenArgs @script:basicAuthArgs
+        $script:iscOauthToken = Invoke-RestMethod @oauthTokenArgs
         $script:iscConnectionTimestamp = Get-Date
         $script:iscConnectionExpiration = $script:iscConnectionTimestamp.AddSeconds($script:iscOauthToken.expires_in)
         Write-Verbose "Successfully connected to the $script:iscTenant API endpoints at $script:iscConnectionTimestamp."
@@ -91,7 +95,7 @@ Function Connect-ISC {
         $script:bearerAuthHeader = @{Authorization = "Bearer $($script:iscOauthToken.access_token)" }
         $script:bearerAuthArgs = @{
             Headers     = $script:bearerAuthHeader
-            ContentType = "$script:cType"
+            ContentType = 'application/json;charset=utf-8'
             ErrorAction = 'Stop'
         }
         

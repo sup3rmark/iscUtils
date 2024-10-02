@@ -16,7 +16,8 @@ Function Invoke-ISCQuery {
     PS> Invoke-ISCQuery
 
 .LINK
-    
+    https://github.com/sup3rmark/iscUtils
+
 #>
     [CmdletBinding()]
     param(
