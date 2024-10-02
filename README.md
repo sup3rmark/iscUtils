@@ -29,8 +29,10 @@ Repeat Step 2 for all tenants you'd like to configure (prod, dev, etc.).
 
 # Using the Module
 
-## Connect-ISC -Tenant foo
+## Connect-ISC -Tenant foo -Domain Default
 This is the first command you'll need to run in order to establish a connection to the Identity Security Cloud API with the specified tenant. This will automatically retrieve the stored secret for the specified tenant and use that to connect.
+
+If your tenant is on the identitynow.com domain, the `-Domain` param is optional, but you can specify `Demo` if your tenant is in the identitynow-demo.com domain or `FedRamp` if your tenant is in the FedRamp domain ([tenant].saas.sailpointfedramp.com).
 
 This only needs to be done once per PowerShell session. Any subsequent calls can leverage the `-ReconnectAutomatically` parameter to automatically refresh the token if needed.
 
