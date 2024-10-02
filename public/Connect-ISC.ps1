@@ -37,15 +37,24 @@ Function Connect-ISC {
         # Define the tenant to which you want to connect.
         [Alias('Environment')]
         [ValidateNotNullOrWhiteSpace()]
-        [String] $Tenant
+        [String] $Tenant,
+
+        # Specify which domain the tenant is in.
+        [ValidateSet('Default', 'Demo', 'FedRamp')]
+        [String] $Domain = 'Default'
     )
 
     $script:iscTenant = $Tenant
-    Write-Verbose '=========================================================='
-    Write-Verbose "Connecting to $Tenant Identity Security Cloud Environment!"
-    Write-Verbose '=========================================================='
+    Write-Verbose '================================================================='
+    Write-Verbose "Connecting to $Tenant Identity Security Cloud $(if ($Domain -ne 'Default') {"$Domain "}) Environment!"
+    Write-Verbose '================================================================='
 
-    $script:iscV3APIurl = "https://$script:iscTenant.api.identitynow.com"
+    $script:iscV3APIurl = switch ($Domain) {
+        'Default' { "https://$script:iscTenant.api.identitynow.com" }
+        'Demo' { "https://$script:iscTenant.api.identitynow-demo.com" }
+        'FedRamp' { "https://$script:iscTenant.api.saas.sailpointfedramp.com" }
+    }
+
     try {
         $credentialObject = Get-Secret -Name "ISC - $script:iscTenant API" -ErrorAction Stop
         $script:iscClientID = $credentialObject.username
