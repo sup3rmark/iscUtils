@@ -53,14 +53,6 @@ Function Get-ISCIdentity {
         [ValidateNotNullOrEmpty()]
         [String] $ID,
 
-        # Enter the SamAccountName of a specific identity to retrieve.
-        [Parameter (
-            Mandatory = $true,
-            ParameterSetName = 'SamAccountName'
-        )]
-        [ValidateNotNullOrEmpty()]
-        [String] $SamAccountName,
-
         # Enter the EmployeeNumber of a specific identity to retrieve.
         [Parameter (
             Mandatory = $true,
