@@ -14,7 +14,28 @@
    5. In the **What is this token for?** box, enter something meaningful like "PowerShell" or "VSCode" to help you identify the token in the list in the future.
    6. Search for `sp:scopes:all` in the search box, and click the slider for the resulting entry.
    7. Click **Create**.
-   8. Copy your **Client ID** and **Client Secret** into this snippet and run the following to add an entry to your Secret Vault (*note: the Secret names set here are specific and must be set as listed here. This is the format that the iscUtils module will expect.*):
+   8. Copy your **Client ID** and **Client Secret** into this snippet and run New-ISCTenant, passing in the tenant name (the `{tenant}` part in `https://{tenant}.identitynow.com`) along with **either** a ClientID and a ClientSecret (the latter of which needs to be a SecureString) **or** a Credential Object (which you can either make by hand or with Get-Credential, using the ClientID as the username and the ClientSecret as the password in either case).
+
+You can do something like this:
+```powershell
+New-ISCTenant -Tenant 'devrel-ga-xxxx '-ClientID '1619...426d' -ClientSecret ('cd2c.......b178' | ConvertTo-SecureString -AsPlainText -Force)
+```
+Or this:
+```powershell
+$clientID = '1619...426d'
+$clientSecret = 'cd2c.......b178' | ConvertTo-SecureString -AsPlainText -Force
+
+$credential = [PSCredential]::New($clientID, $clientSecret)
+
+New-ISCTenant -Tenant 'devrel-ga-xxxx ' -Credential $credential
+```
+Or this:
+```powershell
+$credential = Get-Credential
+
+New-ISCTenant -Tenant 'devrel-ga-xxxx ' -Credential $credential
+```
+Alternatively, you can manually create the Secret yourself, but *note that the Secret names set here are specific and must be set as listed. This is the format that the iscUtils module will expect*. 
 ```powershell
 $clientId = '(replace with Client ID)'
 $clientSecret = '(replace with Client Secret)'
@@ -25,7 +46,7 @@ $org = '(replace with tenant name)'
 Set-Secret -Name "ISC - $org API" -Secret $cred
 ```
 
-Repeat Step 2 for all tenants you'd like to configure (prod, dev, etc.).
+Repeat for all tenants you'd like to configure (prod, dev, etc.).
 
 # Using the Module
 
