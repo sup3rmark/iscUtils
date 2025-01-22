@@ -10,8 +10,7 @@ Function Get-ISCWorkflowExecution {
     None
 
 .OUTPUTS
-    System.Management.Automation.PSCustomObject for individual workflows.
-    System.Object[] when run with -All flag.
+    System.Management.Automation.PSCustomObject
     
 .EXAMPLE
     PS> Get-ISCWorkflow -ID 5xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxd

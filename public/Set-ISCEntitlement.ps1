@@ -6,11 +6,6 @@ Function Set-ISCEntitlement {
 .DESCRIPTION
     Use this tool to modify an entitlement in ISC.
 
-DYNAMIC PARAMETERS
-- Source
-    Specifies the source from which you want to pull entitlements. This parameter is required with the -Entitlements parameter.
-    Its values are calculated when the connection to Identity Security Cloud is established or renewed based on the existing sources in the Identity Security Cloud org.
-
 .INPUTS
     System.String
     You can pipe the entitlement ID of the entitlement you would like to update to Set-ISCEntitlement.

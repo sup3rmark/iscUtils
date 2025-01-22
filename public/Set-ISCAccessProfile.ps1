@@ -6,11 +6,6 @@ Function Set-ISCAccessProfile {
 .DESCRIPTION
     Use this tool to modify an access profile in ISC.
 
-DYNAMIC PARAMETERS
-- Source
-    Specifies the source from which you want to pull entitlements. This parameter is required with the -Entitlements parameter.
-    Its values are calculated when the connection to Identity Security Cloud is established or renewed based on the existing sources in the Identity Security Cloud org.
-
 .INPUTS
     System.String
     You can pipe the access profile ID of the access profile you would like to update to Set-ISCAccessProfile.
@@ -87,46 +82,6 @@ DYNAMIC PARAMETERS
         # Select whether the Access Profile should be requestable.
         [Parameter (Mandatory = $false, ParameterSetName = 'Requestable')]
         [Bool] $Requestable
-
-        <# Skipping these for now
-
-        # Enter an array of new entitlements to add to the specified access profile. Appends to the existing list.
-        [Parameter (Mandatory = $true, ParameterSetName = 'AddEntitlements')]
-        [ValidateNotNullOrEmpty()]
-        [String[]] $AddEntitlements,
-
-        # Enter an array of new entitlements to set on the specified access profile. Replaces the existing list.
-        [Parameter (Mandatory = $true, ParameterSetName = 'ReplaceEntitlements')]
-        [ValidateNotNullOrEmpty()]
-        [String[]] $ReplaceEntitlements,
-
-        # Use this flag to remove specific entitlements from an access profile.
-        [Parameter (Mandatory = $true, ParameterSetName = 'RemoveEntitlements')]
-        [String[]] $RemoveEntitlements
-
-        # Access request configuration for this object
-        accessRequestConfig
-            commentsRequired
-            deniedCommentsRequired
-            approvalSchemes
-                approverType (APP_OWNER, OWNER, SOURCE_OWNER, MANAGER, GOVERNANCE_GROUP)
-                approverId (only used when approverType is GOVERNANCE_GROUP)
-
-        # Revocation request configuration for this object.
-        revokeRequestConfig
-            commentsRequired
-                deniedCommentsRequired
-                approvalSchemes
-                    approverType (APP_OWNER, OWNER, SOURCE_OWNER, MANAGER, GOVERNANCE_GROUP)
-                    approverId (only used when approverType is GOVERNANCE_GROUP)
-        
-        # List of IDs of segments, if any, to which this Access Profile is assigned.
-        segments
-
-        # When an Identity has multiple Accounts on the Source with which an Access Profile is associated, this expression is evaluated against those Accounts to choose one to provision with the Access Profile.
-        # provisioningCriteria
-        #>
-
     )
     
     begin {}

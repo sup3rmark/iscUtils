@@ -10,7 +10,7 @@ Function Get-ISCConnectorRule {
     None
 
 .OUTPUTS
-    System.Management.Automation.PSCustomObject for individual transforms.
+    System.Management.Automation.PSCustomObject for individual connector rules.
     System.Object[] when run with -All flag.
     
 .EXAMPLE
