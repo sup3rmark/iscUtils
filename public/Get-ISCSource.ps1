@@ -1,20 +1,20 @@
-Function Get-ISCAccount {
+Function Get-ISCSource {
     <#
 .SYNOPSIS
-    Retrieve a specific account from Identity Security Cloud.
+    Retrieve a specific source from Identity Security Cloud.
 
 .DESCRIPTION
-    Use this tool to retrieve a specific account from Identity Security Cloud by providing the account ID of the account you want to see. Returns an object.
+    Use this tool to retrieve a specific source's configuration from Identity Security Cloud by providing the name of the source you want to see. Only able to find sources created before your current session. Returns an object.
 
 .INPUTS
     None
 
 .OUTPUTS
-    System.Management.Automation.PSCustomObject for individual accounts.
+    System.Management.Automation.PSCustomObject for individual sources.
     System.Object[] when run with -List flag.
     
 .EXAMPLE
-    PS> Get-ISCAccount -ID 2cXXXXXXXXXXXXXXXXXXXXXXXXXXXX50
+    PS> Get-ISCSource -Source 'Active Directory'
 
 .LINK
     https://github.com/sup3rmark/iscUtils
@@ -26,28 +26,14 @@ Function Get-ISCAccount {
         [Parameter (Mandatory = $false)]
         [Switch] $ReconnectAutomatically,
 
-        # Specify the account ID of a specific account to retrieve.
-        [Parameter (Mandatory = $true, ParameterSetName = 'AccountID')]
-        [ValidateNotNullOrEmpty()]
-        [String] $ID,
-
-        # Specify an identity ID to retrieve all of its correlated accounts.
-        [Parameter (Mandatory = $true, ParameterSetName = 'IdentityID')]
-        [ValidateNotNullOrEmpty()]
-        [String] $IdentityID,
-
-        # Retrieves a list of all accounts from Identity Security Cloud.
-        [Parameter (Mandatory = $true, ParameterSetName = 'List')]
+        # Retrieves a list of all sources from Identity Security Cloud.
+        [Parameter (Mandatory = $false)]
         [Switch] $List,
 
         # Specifies how many items to request per call (max 250).
         [Parameter (Mandatory = $false)]
         [ValidateRange(1, 250)]
         [Int] $Limit = 250,
-
-        # Specifies whether to only retrieve uncorrelated accounts.
-        [Parameter (Mandatory = $false, ParameterSetName = 'List')]
-        [Switch] $Uncorrelated,
 
         # Specifies whether to output the API response directly to the console for debugging.
         [Parameter (Mandatory = $false)]
@@ -86,47 +72,32 @@ Function Get-ISCAccount {
             throw $_.Exception
         }
 
-        $filters = @()
-        if ($ID) {
-            $filters += "id eq `"$ID`""
-        }
-        if ($IdentityID) {
-            $filters += "identityId eq `"$IdentityID`""
-        }
-        if ($List) {
-            # No filter needed if we're looking for _all_ accounts
-        }
-        if ($Uncorrelated) {
-            $filters += 'uncorrelated eq true'
-        }
-        if ($Source) {
-            $filters += "sourceId eq `"$(($script:ISCSources | Where-Object {$_.Name -eq $Source}).id)`""
-        }
+        $baseURL = "$script:iscV3APIurl/v3/sources"
 
-        $baseURL = "$script:iscV3APIurl/v3/accounts?count=true"
-        if ($filters) {
-            $baseURL += "&filters=$($filters -join ' and ')"
-        }
-
-        $accountsData = @()
+        $sourcesData = @()
         do {
-            $url = "$baseURL&offset=$($accountsData.count)&limit=$Limit"
+            if ($Source) {
+                $url = "$baseURL/$(($script:ISCSources | Where-Object {$_.Name -eq $Source}).id)"
+            }
+            else {
+                $url = "$baseURL`?count=true&offset=$($sourcesData.count)&limit=$Limit"
+            }
             Write-Verbose "Calling $url"
             try {
                 $response = Invoke-RestMethod -Uri $url -Method Get -ResponseHeadersVariable responseHeaders @script:bearerAuthArgs
                 if ($DebugResponse) {
                     Write-Host $response
                 }
-                $accountsData += $response
+                $sourcesData += $response
                 Clear-Variable response
             }
             catch {
                 throw $_.Exception
             }
-            Write-Verbose "Retrieved $($accountsData.count) of $($responseHeaders.'X-Total-Count') records."
-        } while ($accountsData.count -ne $($responseHeaders.'X-Total-Count'))
+            Write-Verbose "Retrieved $($sourcesData.count) of $($responseHeaders.'X-Total-Count') records."
+        } while ($sourcesData.count -ne $($responseHeaders.'X-Total-Count') -and $($responseHeaders.'X-Total-Count') -gt 1)
 
-        Write-Verbose 'Finished retrieving accounts.'
-        return $accountsData
+        Write-Verbose 'Finished retrieving sources.'
+        return $sourcesData
     }
 }

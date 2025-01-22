@@ -1,20 +1,25 @@
-Function Get-ISCAccount {
+Function Get-ISCSourceSchema {
     <#
 .SYNOPSIS
-    Retrieve a specific account from Identity Security Cloud.
+    Retrieve a specific source schema from Identity Security Cloud.
 
 .DESCRIPTION
-    Use this tool to retrieve a specific account from Identity Security Cloud by providing the account ID of the account you want to see. Returns an object.
+    Use this tool to retrieve a specific source's schema from Identity Security Cloud by providing the name of the source and which type of schema you want to see. Only able to find sources created before your current session. Returns an object.
 
 .INPUTS
     None
 
 .OUTPUTS
-    System.Management.Automation.PSCustomObject for individual accounts.
-    System.Object[] when run with -List flag.
+    System.Management.Automation.PSCustomObject
     
 .EXAMPLE
-    PS> Get-ISCAccount -ID 2cXXXXXXXXXXXXXXXXXXXXXXXXXXXX50
+    PS> Get-ISCSourceSchema -Source 'Foo' -SchemaName account
+
+.EXAMPLE
+    PS> Get-ISCSourceSchema -Source 'Bar' -SchemaName group
+
+.EXAMPLE
+    PS> Get-ISCSourceSchema -Source 'Bas' -SchemaId 166xxxxxxxxxxxxxxxxxxxxxxxxxx1af
 
 .LINK
     https://github.com/sup3rmark/iscUtils
@@ -26,28 +31,19 @@ Function Get-ISCAccount {
         [Parameter (Mandatory = $false)]
         [Switch] $ReconnectAutomatically,
 
-        # Specify the account ID of a specific account to retrieve.
-        [Parameter (Mandatory = $true, ParameterSetName = 'AccountID')]
+        # Specifies the name of the schema to request.
+        [Parameter (Mandatory = $true, ParameterSetName = 'SchemaName')]
         [ValidateNotNullOrEmpty()]
-        [String] $ID,
+        [String] $SchemaName,
 
-        # Specify an identity ID to retrieve all of its correlated accounts.
-        [Parameter (Mandatory = $true, ParameterSetName = 'IdentityID')]
+        # Specifies the ID of the schema to request.
+        [Parameter (Mandatory = $true, ParameterSetName = 'SchemaId')]
         [ValidateNotNullOrEmpty()]
-        [String] $IdentityID,
+        [String] $SchemaId,
 
-        # Retrieves a list of all accounts from Identity Security Cloud.
+        # Retrieves a list of all schemas for the specified Source from Identity Security Cloud.
         [Parameter (Mandatory = $true, ParameterSetName = 'List')]
         [Switch] $List,
-
-        # Specifies how many items to request per call (max 250).
-        [Parameter (Mandatory = $false)]
-        [ValidateRange(1, 250)]
-        [Int] $Limit = 250,
-
-        # Specifies whether to only retrieve uncorrelated accounts.
-        [Parameter (Mandatory = $false, ParameterSetName = 'List')]
-        [Switch] $Uncorrelated,
 
         # Specifies whether to output the API response directly to the console for debugging.
         [Parameter (Mandatory = $false)]
@@ -57,7 +53,7 @@ Function Get-ISCAccount {
     # Dynamically generate the list of Sources we can select from
     DynamicParam {
         $sourceAttribute = New-Object System.Management.Automation.ParameterAttribute
-        $sourceAttribute.Mandatory = $false
+        $sourceAttribute.Mandatory = $true
 
         $attributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
         $attributeCollection.Add($sourceAttribute)
@@ -78,6 +74,10 @@ Function Get-ISCAccount {
         # A dynamic parameter does not automatically assign a variable to a bound parameter so we're forced to be more explicit.
         if ($PSBoundParameters.Source) { $Source = $PSBoundParameters.Source }
 
+        if (-not $Source) {
+            throw 'No Source provided. Please try again with a Source specified.'
+        }
+
         Try {
             $spConnection = Test-ISCConnection -ReconnectAutomatically:$ReconnectAutomatically -ErrorAction Stop
             Write-Verbose "Connected to $($spConnection.Tenant) Identity Security Cloud."
@@ -86,47 +86,38 @@ Function Get-ISCAccount {
             throw $_.Exception
         }
 
-        $filters = @()
-        if ($ID) {
-            $filters += "id eq `"$ID`""
-        }
-        if ($IdentityID) {
-            $filters += "identityId eq `"$IdentityID`""
-        }
-        if ($List) {
-            # No filter needed if we're looking for _all_ accounts
-        }
-        if ($Uncorrelated) {
-            $filters += 'uncorrelated eq true'
-        }
-        if ($Source) {
-            $filters += "sourceId eq `"$(($script:ISCSources | Where-Object {$_.Name -eq $Source}).id)`""
-        }
+        $baseURL = "$script:iscV3APIurl/v3/sources/$(($script:ISCSources | Where-Object {$_.Name -eq $Source}).id)/schemas"
 
-        $baseURL = "$script:iscV3APIurl/v3/accounts?count=true"
-        if ($filters) {
-            $baseURL += "&filters=$($filters -join ' and ')"
-        }
-
-        $accountsData = @()
+        $schamasData = @()
         do {
-            $url = "$baseURL&offset=$($accountsData.count)&limit=$Limit"
+            if ($SchemaName) {
+                Write-Verbose "Retrieving schema with name $SchemaName."
+                $url = "$baseURL`?include-names=$SchemaName"
+            }
+            elseif ($SchemaId) {
+                Write-Verbose "Retrieving schema with ID $SchemaId."
+                $url = "$baseURL`/$SchemaId"
+            }
+            elseif ($List) {
+                Write-Verbose 'Retrieving list of all schemas.'
+                $url = $baseURL
+            }
             Write-Verbose "Calling $url"
             try {
                 $response = Invoke-RestMethod -Uri $url -Method Get -ResponseHeadersVariable responseHeaders @script:bearerAuthArgs
                 if ($DebugResponse) {
                     Write-Host $response
                 }
-                $accountsData += $response
+                $schamasData += $response
                 Clear-Variable response
             }
             catch {
                 throw $_.Exception
             }
-            Write-Verbose "Retrieved $($accountsData.count) of $($responseHeaders.'X-Total-Count') records."
-        } while ($accountsData.count -ne $($responseHeaders.'X-Total-Count'))
+            Write-Verbose "Retrieved $($schamasData.count) of $($responseHeaders.'X-Total-Count') records."
+        } while ($schamasData.count -ne $($responseHeaders.'X-Total-Count') -and $($responseHeaders.'X-Total-Count') -gt 1)
 
-        Write-Verbose 'Finished retrieving accounts.'
-        return $accountsData
+        Write-Verbose 'Finished retrieving schemas.'
+        return $schamasData
     }
 }

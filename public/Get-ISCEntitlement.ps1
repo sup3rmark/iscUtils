@@ -11,6 +11,7 @@ Function Get-ISCEntitlement {
 
 .OUTPUTS
     System.Management.Automation.PSCustomObject for individual entitlements.
+    System.Object[] when run with -List flag.
     
 .EXAMPLE
     PS> Get-ISCEntitlement -ID 2cXXXXXXXXXXXXXXXXXXXXXXXXXXXX50
