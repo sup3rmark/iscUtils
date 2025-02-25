@@ -132,7 +132,7 @@ Function Get-ISCIdentity {
     }
     Write-Verbose "Query:`n$($query | ConvertTo-Json)"
 
-    $uri = "$script:iscV3APIurl/v3/search"
+    $uri = "$script:iscAPIurl/v3/search"
     Write-Verbose "Query URL: $uri"
 
     $response = Invoke-RestMethod -Uri "$uri`?count=true" -Method Post -ResponseHeadersVariable responseHeaders -Body ($query | ConvertTo-Json) @script:bearerAuthArgs

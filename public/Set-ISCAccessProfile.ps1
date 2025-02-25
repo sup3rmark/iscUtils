@@ -138,7 +138,7 @@ Function Set-ISCAccessProfile {
                 $body = @( $changes )
                 Write-Verbose 'JSON:'
                 Write-Verbose (ConvertTo-Json $body)
-                $setAccessProfileURL = "$script:iscV3APIurl/v3/access-profiles/$ID"
+                $setAccessProfileURL = "$script:iscAPIurl/v3/access-profiles/$ID"
                 Write-Verbose "URL: $setAccessProfileURL"
 
                 $setAccessProfileArgs = @{

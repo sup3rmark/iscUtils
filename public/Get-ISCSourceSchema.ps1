@@ -86,7 +86,7 @@ Function Get-ISCSourceSchema {
             throw $_.Exception
         }
 
-        $baseURL = "$script:iscV3APIurl/v3/sources/$(($script:ISCSources | Where-Object {$_.Name -eq $Source}).id)/schemas"
+        $baseURL = "$script:iscAPIurl/v3/sources/$(($script:ISCSources | Where-Object {$_.Name -eq $Source}).id)/schemas"
 
         $schamasData = @()
         do {

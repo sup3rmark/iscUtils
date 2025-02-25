@@ -83,7 +83,7 @@ Function Get-ISCAccessProfile {
         $null
     }
     
-    $uri = "$script:iscV3APIurl/v3/access-profiles?$filter"
+    $uri = "$script:iscAPIurl/v3/access-profiles?$filter"
     $response = Invoke-RestMethod -Uri $uri @script:bearerAuthArgs
     $accessProfileData = $response
     Write-Verbose "Retrieved $($accessProfileData.count) items."

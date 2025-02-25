@@ -121,7 +121,7 @@ Function Set-ISCEntitlement {
                 $body = @( $changes )
                 Write-Verbose 'JSON:'
                 Write-Verbose (ConvertTo-Json $body)
-                $setEntitlementURL = "$script:iscV3APIurl/beta/entitlements/$ID"
+                $setEntitlementURL = "$script:iscAPIurl/beta/entitlements/$ID"
                 Write-Verbose "URL: $setEntitlementURL"
 
                 $setEntitlementArgs = @{

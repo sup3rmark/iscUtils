@@ -81,7 +81,7 @@ Function Get-ISCWorkflow {
         throw $_.Exception
     }
 
-    $url = "$script:iscV3APIurl/v3/workflows"
+    $url = "$script:iscAPIurl/v3/workflows"
     if ($ID) {
         $url += "/$ID"
     }

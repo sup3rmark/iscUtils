@@ -103,7 +103,7 @@ Function Get-ISCAccount {
             $filters += "sourceId eq `"$(($script:ISCSources | Where-Object {$_.Name -eq $Source}).id)`""
         }
 
-        $baseURL = "$script:iscV3APIurl/v3/accounts?count=true"
+        $baseURL = "$script:iscAPIurl/v3/accounts?count=true"
         if ($filters) {
             $baseURL += "&filters=$($filters -join ' and ')"
         }

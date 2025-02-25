@@ -149,7 +149,7 @@ Function Get-ISCEntitlement {
             $filters += "source.id eq `"$(($script:ISCSources | Where-Object {$_.Name -eq $Source}).id)`""
         }
 
-        $baseURL = "$script:iscV3APIurl/beta/entitlements?count=true"
+        $baseURL = "$script:iscAPIurl/beta/entitlements?count=true"
         if ($filters) {
             $query += "&filters=$($filters -join ' and ')"
         }

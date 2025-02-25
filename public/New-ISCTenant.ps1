@@ -57,7 +57,12 @@ Function New-ISCTenant {
         )]
         [ValidateNotNullOrWhiteSpace()]
         [System.Management.Automation.PSCredential]
-        [System.Management.Automation.Credential()] $Credential
+        [System.Management.Automation.Credential()] $Credential,
+
+        # Optionally specify which domain the tenant is in.
+        [Parameter (Mandatory = $false)]
+        [ValidateSet('Default', 'Demo', 'FedRamp')]
+        [String] $Domain
     )
 
     if ($PsCmdlet.ParameterSetName -eq 'ClientCredentials') {
@@ -65,7 +70,15 @@ Function New-ISCTenant {
     }
 
     if ($Credential) {
-        Set-Secret -Name "ISC - $Tenant API" -Secret $Credential
+        $splat = @{
+            Name   = "ISC - $Tenant API"
+            Secret = $Credential 
+        }
+        if ($Domain) {
+            $splat += @{ Metadata = @{ Domain = $Domain } }
+            Write-Verbose "$Domain Domain added to Secret Metadata."
+        }
+        Set-Secret @splat
         Write-Host "Configuration saved for $Tenant tenant."
     }
     else {

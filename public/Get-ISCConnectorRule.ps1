@@ -57,7 +57,7 @@ Function Get-ISCConnectorRule {
         throw $_.Exception
     }
 
-    $url = "$script:iscV3APIurl/beta/connector-rules"
+    $url = "$script:iscAPIurl/beta/connector-rules"
     if ($Id) {
         $url += "/$Id"
     }

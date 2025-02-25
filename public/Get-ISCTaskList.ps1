@@ -46,7 +46,7 @@ Function Get-ISCTaskList {
             throw $_.Exception
         }
 
-        $baseURL = "$script:iscV3APIurl/beta/task-status?limit=$Limit"
+        $baseURL = "$script:iscAPIurl/beta/task-status?limit=$Limit"
 
         $tasksData = @()
         do {
