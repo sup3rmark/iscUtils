@@ -62,7 +62,7 @@ Function Get-ISCTransform {
         throw $_.Exception
     }
 
-    $baseURL = "$script:iscV3APIurl/v3/transforms?count=true"
+    $baseURL = "$script:iscAPIurl/v3/transforms?count=true"
     if ($Name) {
         $baseURL += "&name=$Name"
     }

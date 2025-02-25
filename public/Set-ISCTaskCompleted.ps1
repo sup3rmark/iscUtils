@@ -57,7 +57,7 @@ Function Set-ISCTaskCompleted {
             $body = @( $changes )
             Write-Verbose 'JSON:'
             Write-Verbose (ConvertTo-Json $body)
-            $url = "$script:iscV3APIurl/beta/task-status/$ID"
+            $url = "$script:iscAPIurl/beta/task-status/$ID"
             Write-Verbose "URL: $url"
 
             $taskArgs = @{

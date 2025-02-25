@@ -55,15 +55,8 @@ Function Connect-ISC {
 
     $script:iscTenant = $Tenant
     Write-Verbose '================================================================='
-    Write-Verbose "Connecting to $Tenant Identity Security Cloud $(if ($Domain -ne 'Default') {"$Domain "})Environment!"
+    Write-Verbose "Connecting to $Tenant Identity Security Cloud Tenant!"
     Write-Verbose '================================================================='
-
-    $script:iscDomain = $Domain
-    $script:iscV3APIurl = switch ($Domain) {
-        'Default' { "https://$script:iscTenant.api.identitynow.com" }
-        'Demo' { "https://$script:iscTenant.api.identitynow-demo.com" }
-        'FedRamp' { "https://$script:iscTenant.api.saas.sailpointfedramp.com" }
-    }
 
     try {
         $credentialObject = Get-Secret -Name "ISC - $script:iscTenant API" -ErrorAction Stop
@@ -74,6 +67,26 @@ Function Connect-ISC {
         throw "Failed to retrieve ISC credentials from the PowerShell Secret Store. Exception: $($_.Exception.Message)"
     }
 
+    $metadataDomain = Get-SecretInfo -Name "ISC - $script:iscTenant API"
+
+    if ($metadataDomain.Metadata.Domain -and ($Domain -ne $metadataDomain.Metadata.Domain)) {
+        Write-Verbose "Provided Domain value $Domain does not match value stored in Secret. Overriding to $($metadataDomain.Metadata.Domain)."
+        $Domain = $metadataDomain.Metadata.Domain
+    }
+
+    if ($null -eq $Domain) {
+        throw 'No Domain stored in Secret for specified Tenant. Please provide a Domain value.'
+    }
+
+    $script:iscDomain = $Domain
+    Write-Verbose "Domain set to $script:iscDomain."
+
+    $script:iscAPIurl = switch ($script:iscDomain) {
+        'Default' { "https://$script:iscTenant.api.identitynow.com" }
+        'Demo' { "https://$script:iscTenant.api.identitynow-demo.com" }
+        'FedRamp' { "https://$script:iscTenant.api.saas.sailpointfedramp.com" }
+    }
+
     try {
         $oauthBody = @{
             grant_type    = 'client_credentials'
@@ -81,7 +94,7 @@ Function Connect-ISC {
             client_secret = "$script:iscClientSecret"
         }
         $oauthTokenArgs = @{
-            Uri         = "$script:iscV3APIurl/oauth/token"
+            Uri         = "$script:iscAPIurl/oauth/token"
             Form        = $oauthBody
             Method      = 'Post'
             ContentType = 'application/x-www-form-urlencoded'
@@ -99,7 +112,7 @@ Function Connect-ISC {
             ErrorAction = 'Stop'
         }
         
-        [array]$script:iscSources = Invoke-RestMethod -Uri "$script:iscV3APIurl/v3/sources" @script:bearerAuthArgs
+        [array]$script:iscSources = Invoke-RestMethod -Uri "$script:iscAPIurl/v3/sources" @script:bearerAuthArgs
         Write-Verbose ($script:iscSources | Select-Object id, name, description | Format-Table | Out-String)
     }
     catch {

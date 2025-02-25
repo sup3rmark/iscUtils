@@ -72,7 +72,7 @@ Function Get-ISCSource {
             throw $_.Exception
         }
 
-        $baseURL = "$script:iscV3APIurl/v3/sources"
+        $baseURL = "$script:iscAPIurl/v3/sources"
 
         $sourcesData = @()
         do {

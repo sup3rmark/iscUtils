@@ -56,7 +56,7 @@ Function Invoke-ISCQuery {
             includeNested = $false
             sort          = @('id')
         }
-        $baseURL = "$script:iscV3APIurl/v3/search"
+        $baseURL = "$script:iscAPIurl/v3/search"
         Write-Verbose "Calling $baseURL"
         Write-Verbose ($body | ConvertTo-Json)
 

@@ -86,7 +86,7 @@ Function Get-ISCWorkflowExecutionList {
     if ($filters) {
         $params += "filters=$($filters -join ' and ')"
     }
-    $baseURL = "$script:iscV3APIurl/v3/workflows/$ID/executions?$($params -join '&')"
+    $baseURL = "$script:iscAPIurl/v3/workflows/$ID/executions?$($params -join '&')"
 
     $executionsData = @()
     do {

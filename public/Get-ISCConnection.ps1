@@ -40,7 +40,7 @@ Function Get-ISCConnection {
     $connectionObject | Add-Member -Type NoteProperty -Name 'Tenant' -Value $script:iscTenant
     $connectionObject | Add-Member -Type NoteProperty -Name 'Domain' -Value $script:iscDomain
     $connectionObject | Add-Member -Type NoteProperty -Name 'Token' -Value $script:iscOauthToken.access_token
-    $connectionObject | Add-Member -Type NoteProperty -Name 'v3URL' -Value $script:iscV3APIurl
+    $connectionObject | Add-Member -Type NoteProperty -Name 'API URL' -Value $script:iscAPIurl
     if ($IncludeSources.IsPresent) {
         $connectionObject | Add-Member -Type NoteProperty -Name 'SourceList' -Value $script:iscSources
     }

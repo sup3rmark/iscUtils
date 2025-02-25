@@ -51,7 +51,7 @@ Function Get-ISCWorkflowExecution {
         throw $_.Exception
     }
 
-    $url = "$script:iscV3APIurl/v3/workflow-executions/$ID/history"
+    $url = "$script:iscAPIurl/v3/workflow-executions/$ID/history"
     
     Write-Verbose "Calling $url"
     try {
