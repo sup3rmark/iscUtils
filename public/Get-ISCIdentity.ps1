@@ -131,11 +131,10 @@ Function Get-ISCIdentity {
         $query += @{ includeNested = $false }
     }
     Write-Verbose "Query:`n$($query | ConvertTo-Json)"
+    $baseURL = "$script:iscAPIurl/v3/search"
+    Write-Verbose "Query URL: $baseURL"
 
-    $uri = "$script:iscAPIurl/v3/search"
-    Write-Verbose "Query URL: $uri"
-
-    $response = Invoke-RestMethod -Uri "$uri`?count=true" -Method Post -ResponseHeadersVariable responseHeaders -Body ($query | ConvertTo-Json) @script:bearerAuthArgs
+    $response = Invoke-RestMethod -Uri "$baseURL`?count=true" -Method Post -ResponseHeadersVariable responseHeaders -Body ($query | ConvertTo-Json) @script:bearerAuthArgs
     $totalCount = [int]::Parse($responseHeaders.'X-Total-Count')
     $identitiesData = $response
     $retrievedCount = $identitiesData | Measure-Object | Select-Object -ExpandProperty Count
@@ -143,7 +142,7 @@ Function Get-ISCIdentity {
     while ($retrievedCount -lt $totalCount) {
         try {
             $nextQuery = $query + @{searchAfter = @($identitiesData[-1].id) }
-            $response = Invoke-RestMethod -Uri $uri -Method Post -Body ($nextQuery | ConvertTo-Json) @script:bearerAuthArgs
+            $response = Invoke-RestMethod -Uri $baseURL -Method Post -Body ($nextQuery | ConvertTo-Json) @script:bearerAuthArgs
             $identitiesData += $response
             $retrievedCount = $identitiesData | Measure-Object | Select-Object -ExpandProperty Count
             Write-Verbose "Retrieved $retrievedCount items out of total $totalCount."
