@@ -62,7 +62,11 @@ Function New-ISCTenant {
         # Optionally specify which domain the tenant is in.
         [Parameter (Mandatory = $false)]
         [ValidateSet('Default', 'Demo', 'FedRamp')]
-        [String] $Domain
+        [String] $Domain,
+
+        # Overwrite any existing credential for this tenant.
+        [Parameter (Mandatory = $false)]
+        [Switch] $Force
     )
 
     if ($PsCmdlet.ParameterSetName -eq 'ClientCredentials') {
@@ -78,8 +82,11 @@ Function New-ISCTenant {
             $splat += @{ Metadata = @{ Domain = $Domain } }
             Write-Verbose "$Domain Domain added to Secret Metadata."
         }
+        if ((Get-Secret -Name $splat.Name) -and -not $Force) {
+            throw "Secret already exists for $Tenant tenant. Specify Force to update the existing configuration."
+        }
         Set-Secret @splat
-        Write-Host "Configuration saved for $Tenant tenant."
+        Write-Host "Configuration saved for $Tenant tenant$(if ($Domain){" with a $Domain domain"})."
     }
     else {
         throw 'No credential provided.'
