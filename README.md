@@ -94,24 +94,25 @@ Test-ISCConnection -ReconnectAutomatically
 $accounts = Get-ISCAccount -List
 
 # Get a list of all accounts in the Active Directory source
-Get-ISCAccount -List -Source 'Active Directory' | ConvertTo-Csv -Delimiter "`t" | Set-Clipboard
+$accounts = Get-ISCAccount -List -Source 'Active Directory'
+
+# Get all attributes for all accounts in the Active Directory source and send them to the Clipboard in a format that can be pasted into Excel
+Get-ISCAccount -List -Source 'Active Directory' -SchemaAttributes | ConvertTo-Csv -Delimiter "`t" | Set-Clipboard
 
 # Get a list of all uncorrelated accounts in the Active Directory source, and output the account attributes to Out-GridView (Windows only)
-(Get-ISCAccount -List -Source 'Active Directory' -Uncorrelated).attributes | Out-GridView
-
-# Get a list of all uncorrelated accounts in the Active Directory source and export with all attributes in the source schema as a tab-delimited list to the clipboard for easy pasting into Excel
-$adAccounts = Get-ISCAccount -List -Source 'Active Directory'
-$adAccounts.attributes | Select-Object (Get-ISCSourceSchema -SchemaName account -Source 'Active Directory').attributes.name | ConvertTo-Csv -Delimiter "`t" | Set-Clipboard
-
-# Retrieve all accounts from a source, select all account attributes, and export to the clipboard for pasting into Excel
-$adAccounts = Get-ISCAccount -List -Source 'Active Directory'
-$adAccounts.attributes | Select-Object (Get-ISCSourceSchema -SchemaName account -source 'Active Directory').attributes.name | ConvertTo-Csv -Delimiter "`t" | Set-Clipboard
+Get-ISCAccount -List -Source 'Active Directory' -Uncorrelated -SchemaAttributes | Out-GridView
 ```
 
 ## Get Identities
 ```powershell
 # Get a list of all identities
 $identity = Get-ISCIdentity -List
+
+# Get all attributes for all identities
+$identity = Get-ISCIdentity -List -IdentityAttributes
+
+# Get all attributes for all identities and send them to the Clipboard in a format that can be pasted into Excel
+Get-ISCIdentity -List -IdentityAttributes | ConvertTo-Csv -Delimiter "`t" | Set-Clipboard
 
 # Get all accounts correlated to the identity with EmployeeNumber 2
 (Get-ISCIdentity -EmployeeNumber 2 -IncludeNested).accounts
