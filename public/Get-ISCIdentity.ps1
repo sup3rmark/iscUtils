@@ -76,8 +76,11 @@ Function Get-ISCIdentity {
 
         # Includes nested objects from returned search results, such as accounts, access, etc. This runs much more slowly, but returns more detailed results.
         [Parameter (Mandatory = $false)]
-        [Switch] $IncludeNested
+        [Switch] $IncludeNested,
 
+        # Return just the schema attributes for the retrieved accounts.
+        [Parameter (Mandatory = $false)]
+        [Switch] $IdentityAttributes
     )
 
     try {
@@ -159,6 +162,10 @@ Function Get-ISCIdentity {
     }
     else {
         Write-Verbose "No identities returned from $($spConnection.Tenant) ISC."
+    }
+
+    if ($IdentityAttributes) {
+        $identitiesData = $identitiesData.attributes | Select-Object (Get-ISCIdentityAttributeList).name
     }
 
     return $identitiesData

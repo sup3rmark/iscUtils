@@ -88,7 +88,7 @@ Function Get-ISCSourceSchema {
 
         $baseURL = "$script:iscAPIurl/v3/sources/$(($script:ISCSources | Where-Object {$_.Name -eq $Source}).id)/schemas"
 
-        $schamasData = @()
+        $schemasData = @()
         do {
             if ($SchemaName) {
                 Write-Verbose "Retrieving schema with name $SchemaName."
@@ -108,16 +108,16 @@ Function Get-ISCSourceSchema {
                 if ($DebugResponse) {
                     Write-Host $response
                 }
-                $schamasData += $response
+                $schemasData += $response
                 Clear-Variable response
             }
             catch {
                 throw $_.Exception
             }
-            Write-Verbose "Retrieved $($schamasData.count) of $($responseHeaders.'X-Total-Count') records."
-        } while ($schamasData.count -ne $($responseHeaders.'X-Total-Count') -and $($responseHeaders.'X-Total-Count') -gt 1)
+            Write-Verbose "Retrieved $($schemasData.count) of $($responseHeaders.'X-Total-Count') records."
+        } while ($schemasData.count -ne $($responseHeaders.'X-Total-Count') -and $($responseHeaders.'X-Total-Count') -gt 1)
 
         Write-Verbose 'Finished retrieving schemas.'
-        return $schamasData
+        return $schemasData
     }
 }

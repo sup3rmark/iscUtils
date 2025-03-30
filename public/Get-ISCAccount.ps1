@@ -40,6 +40,10 @@ Function Get-ISCAccount {
         [Parameter (Mandatory = $true, ParameterSetName = 'List')]
         [Switch] $List,
 
+        # Return just the schema attributes for the retrieved accounts
+        [Parameter (Mandatory = $false)]
+        [Switch] $SchemaAttributes,
+
         # Specifies how many items to request per call (max 250).
         [Parameter (Mandatory = $false)]
         [ValidateRange(1, 250)]
@@ -127,6 +131,12 @@ Function Get-ISCAccount {
         } while ($accountsData.count -ne $($responseHeaders.'X-Total-Count'))
 
         Write-Verbose 'Finished retrieving accounts.'
+
+        if ($SchemaAttributes) {
+            $attributes = Get-ISCSourceSchema -SchemaName account -Source $Source | Select-Object -ExpandProperty attributes
+            $accountsData = $accountsData.attributes | Select-Object $attributes.name
+        }
+        
         return $accountsData
     }
 }
