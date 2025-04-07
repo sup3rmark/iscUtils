@@ -82,7 +82,7 @@ Function New-ISCTenant {
             $splat += @{ Metadata = @{ Domain = $Domain } }
             Write-Verbose "$Domain Domain added to Secret Metadata."
         }
-        if ((Get-Secret -Name $splat.Name) -and -not $Force) {
+        if ((Get-Secret -Name $splat.Name -ErrorAction SilentlyContinue) -and -not $Force) {
             throw "Secret already exists for $Tenant tenant. Specify Force to update the existing configuration."
         }
         Set-Secret @splat
