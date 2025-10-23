@@ -63,7 +63,7 @@ Function Get-ISCPendingTaskList {
                 throw $_.Exception
             }
             Write-Verbose "Retrieved $($tasksData.count) records."
-        } while ($response.count -gt 0)
+        } while ($response.count -eq $Limit)
 
         Write-Verbose 'Finished retrieving tasks.'
         return $tasksData

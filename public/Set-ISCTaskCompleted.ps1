@@ -66,7 +66,7 @@ Function Set-ISCTaskCompleted {
                 Body   = (ConvertTo-Json $body)
             }
 
-            $modifiedTask = Invoke-RestMethod @taskArgs @script:bearerAuthArgs
+            $modifiedTask = Invoke-RestMethod @taskArgs @script:bearerAuthArgs -ContentType 'application/json-patch+json'
         }
         Catch {
             throw "ERROR: Failed to update task with $($taskArgs.Body) - $($_.Exception.Message)"
