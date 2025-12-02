@@ -1,5 +1,5 @@
 #Requires -Modules Microsoft.PowerShell.SecretManagement
-Function Connect-ISC {
+function Connect-ISC {
     <#
 .SYNOPSIS
     Connect to the ISC API.
@@ -39,18 +39,41 @@ Function Connect-ISC {
 
 #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
         # Define the tenant to which you want to connect.
         [Alias('Environment')]
-        [Parameter (Mandatory = $true)]
+        [Parameter (
+            Mandatory = $true,
+            ParameterSetName = 'Default'
+        )]
+        [Parameter (
+            Mandatory = $true,
+            ParameterSetName = 'PAT'
+        )]
         [ValidateNotNullOrWhiteSpace()]
         [String] $Tenant,
 
         # Specify which domain the tenant is in.
-        [Parameter (Mandatory = $false)]
+        [Parameter ()]
         [ValidateSet('Default', 'Demo', 'FedRamp')]
-        [String] $Domain = 'Default'
+        [String] $Domain = 'Default',
+
+        # Specify a Client ID to connect with a PAT.
+        [Parameter (
+            Mandatory = $true,
+            ParameterSetName = 'PAT'
+        )]
+        [ValidateNotNullOrEmpty()]
+        [String] $ClientID,
+
+        # Specify a Client Secret to connect with a PAT.
+        [Parameter (
+            Mandatory = $true,
+            ParameterSetName = 'PAT'
+        )]
+        [ValidateNotNullOrEmpty()]
+        [SecureString] $ClientSecret
     )
 
     $script:iscTenant = $Tenant
@@ -58,13 +81,19 @@ Function Connect-ISC {
     Write-Verbose "Connecting to $Tenant Identity Security Cloud Tenant!"
     Write-Verbose '================================================================='
 
-    try {
-        $credentialObject = Get-Secret -Name "ISC - $script:iscTenant API" -ErrorAction Stop
-        $script:iscClientID = $credentialObject.username
-        $script:iscClientSecret = $credentialObject.GetNetworkCredential().Password
+    if ($ClientID) {
+        $script:iscClientID = $ClientID
+        $script:iscClientSecret = $ClientSecret | ConvertFrom-SecureString -AsPlainText
     }
-    catch {
-        throw "Failed to retrieve ISC credentials from the PowerShell Secret Store. Exception: $($_.Exception.Message)"
+    else {
+        try {
+            $credentialObject = Get-Secret -Name "ISC - $script:iscTenant API" -ErrorAction Stop
+            $script:iscClientID = $credentialObject.username
+            $script:iscClientSecret = $credentialObject.GetNetworkCredential().Password
+        }
+        catch {
+            throw "Failed to retrieve ISC credentials from the PowerShell Secret Store. Exception: $($_.Exception.Message)"
+        }
     }
 
     $metadataDomain = Get-SecretInfo -Name "ISC - $script:iscTenant API"
