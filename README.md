@@ -20,13 +20,6 @@ The `Microsoft.PowerShell.SecretManagement` and `Microsoft.PowerShell.SecretStor
    8. Copy your **Client ID** and **Client Secret** into this snippet and run New-ISCTenant, passing in the tenant name (the `{tenant}` part in `https://{tenant}.identitynow.com`) along with **either** a ClientID and a ClientSecret (the latter of which needs to be a SecureString) **or** a Credential Object (which you can either make by hand or with Get-Credential, using the ClientID as the username and the ClientSecret as the password in either case).
    9. If your tenant is in the FedRamp domain (`https://{tenant}.saas.sailpointfedramp.com`) or the Demo domain (`https://{tenant}.identitynow-demo.com`), you'll want to specify that when creating the tenant configuration using the `-Domain` parameter.
 
-## Connect without storing credentials
-If, for whatever reason, you can't (or just don't want to) store your credentials in the PowerShell Secret Vault, you now have the option to connect by passing in a PAT at runtime (see above for instructions on generating a PAT):
-```powershell
-Connect-ISC -Tenant 'devrel-ga-xxxx' -Domain Demo -ClientID '1619...426d' -ClientSecret ('cd2c.......b178' | ConvertTo-SecureString -AsPlainText -Force)
-```
-Note that the ClientSecret is still expecting a SecureString.
-
 You can do something like this:
 ```powershell
 New-ISCTenant -Tenant 'devrel-ga-xxxx' -Domain Demo -ClientID '1619...426d' -ClientSecret ('cd2c.......b178' | ConvertTo-SecureString -AsPlainText -Force)
@@ -64,6 +57,14 @@ If you'd like to remove an existing tenant configuration:
 ```powershell
 Remove-ISCTenant -Tenant 'devrel-ga-xxxx'
 ```
+
+## Connect without storing credentials
+If, for whatever reason, you can't (or just don't want to) store your credentials in the PowerShell Secret Vault, you now have the option to connect by passing in a PAT at runtime (see above for instructions on generating a PAT):
+```powershell
+Connect-ISC -Tenant 'devrel-ga-xxxx' -Domain Demo -ClientID '1619...426d' -ClientSecret ('cd2c.......b178' | ConvertTo-SecureString -AsPlainText -Force)
+```
+Note that the ClientSecret is still expecting a SecureString.
+
 
 # Using the Module
 
