@@ -2,12 +2,15 @@
  A collection of functions that call the SailPoint Identity Security Cloud API.
 
 # Configuration
-*Note: this module requires PowerShell 7, as well as the `Microsoft.PowerShell.SecretManagement` and `Microsoft.PowerShell.SecretStore` modules.*
+*Note: this module requires PowerShell 7.*
 
+The `Microsoft.PowerShell.SecretManagement` and `Microsoft.PowerShell.SecretStore` modules were previously required, but are now optional.
+
+## Connect with stored credentials
 1. (If you already have a Secret Vault established, you can skip this step.) Create a Secret Vault and set it as the default Vault: `Register-SecretVault -Name Default -ModuleName Microsoft.PowerShell.SecretStore -DefaultVault`
    - You can remove the need to provide a password on every access of the Vault by running the following: `Set-SecretStoreConfiguration -Authentication None -Interaction None` (*Note: this is a less secure configuration and should not be used without understanding the risks associated therein.*). You may be prompted to set and provide a password during this process. While counter-intuitive, just go with it and set a password which will subsequently be ignored.
 2. Generate a Personal Access Token in SailPoint and add to your newly-created Secret Vault:
-   1. Access your tenant as normal (https://[tenant].identitynow.com)
+   1. Access your tenant as normal (https://[tenant].identitynow.com, probably)
    2. Click your name in the top right corner, and select **Preferences**
    3. Select **Personal Access Tokens** on the left-hand side
    4. Click **New Token**
@@ -16,6 +19,13 @@
    7. Click **Create**.
    8. Copy your **Client ID** and **Client Secret** into this snippet and run New-ISCTenant, passing in the tenant name (the `{tenant}` part in `https://{tenant}.identitynow.com`) along with **either** a ClientID and a ClientSecret (the latter of which needs to be a SecureString) **or** a Credential Object (which you can either make by hand or with Get-Credential, using the ClientID as the username and the ClientSecret as the password in either case).
    9. If your tenant is in the FedRamp domain (`https://{tenant}.saas.sailpointfedramp.com`) or the Demo domain (`https://{tenant}.identitynow-demo.com`), you'll want to specify that when creating the tenant configuration using the `-Domain` parameter.
+
+## Connect without storing credentials
+If, for whatever reason, you can't (or just don't want to) store your credentials in the PowerShell Secret Vault, you now have the option to connect by passing in a PAT at runtime (see above for instructions on generating a PAT):
+```powershell
+Connect-ISC -Tenant 'devrel-ga-xxxx' -Domain Demo -ClientID '1619...426d' -ClientSecret ('cd2c.......b178' | ConvertTo-SecureString -AsPlainText -Force)
+```
+Note that the ClientSecret is still expecting a SecureString.
 
 You can do something like this:
 ```powershell
