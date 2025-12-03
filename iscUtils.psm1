@@ -1,14 +1,9 @@
-﻿#Get public and private function definition files.
-$publicFunctions = @(Get-ChildItem -Path "$PSScriptRoot\Public" -Recurse -Include *.ps1 -ErrorAction SilentlyContinue)
-$privateFunctions = @(Get-ChildItem -Path "$PSScriptRoot\Private" -Recurse -Include *.ps1 -ErrorAction SilentlyContinue)
+﻿#Get all function definition files.
+$allFunctions = @(Get-ChildItem -Path $PSScriptRoot -Recurse -Include *.ps1)
 
 #Dot source the files
-foreach ($import in @($publicFunctions + $privateFunctions)) {
+foreach ($import in $allFunctions) {
     . $import.FullName
 }
 
-#region Set Global Module Variables
-
-#endregion
-
-Export-ModuleMember -Function $publicFunctions.BaseName -Alias @()
+Export-ModuleMember -Function 'Connect-ISC', 'Get-ISCAccessProfile', 'Get-ISCAccount', 'Get-ISCConnection', 'Get-ISCConnectorRule', 'Get-ISCEntitlement', 'Get-ISCIdentity', 'Get-ISCIdentityAttribute', 'Get-ISCIdentityAttributeList', 'Get-ISCPendingTaskList', 'Get-ISCSource', 'Get-ISCSourceSchema', 'Get-ISCTaskList', 'Get-ISCTransform', 'Get-ISCWorkflow', 'Get-ISCWorkflowExecution', 'Get-ISCWorkflowExecutionList', 'Invoke-ISCAccountAggregation', 'Invoke-ISCQuery', 'New-ISCTenant', 'Remove-ISCTenant', 'Set-ISCAccessProfile', 'Set-ISCEntitlement', 'Set-ISCTaskCompleted', 'Test-ISCConnection' -Alias @()
