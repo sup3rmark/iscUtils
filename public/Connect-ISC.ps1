@@ -1,4 +1,3 @@
-#Requires -Modules Microsoft.PowerShell.SecretManagement
 function Connect-ISC {
     <#
 .SYNOPSIS
