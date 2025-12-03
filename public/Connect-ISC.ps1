@@ -88,14 +88,13 @@ function Connect-ISC {
         try {
             $credentialObject = Get-Secret -Name "ISC - $script:iscTenant API" -ErrorAction Stop
             $script:iscClientID = $credentialObject.username
-            $script:iscClientSecret = $credentialObject.GetNetworkCredential().Password
+            $script:iscClientSecret = $credentialObject.GetNetworkCredential().Password 
+            $metadataDomain = Get-SecretInfo -Name "ISC - $script:iscTenant API"
         }
         catch {
             throw "Failed to retrieve ISC credentials from the PowerShell Secret Store. Exception: $($_.Exception.Message)"
         }
     }
-
-    $metadataDomain = Get-SecretInfo -Name "ISC - $script:iscTenant API"
 
     if ($metadataDomain.Metadata.Domain -and ($Domain -ne $metadataDomain.Metadata.Domain)) {
         Write-Verbose "Provided Domain value $Domain does not match value stored in Secret. Overriding to $($metadataDomain.Metadata.Domain)."
