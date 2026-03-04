@@ -1,4 +1,4 @@
-Function Set-ISCEntitlement {
+function Set-ISCEntitlement {
     <#
 .SYNOPSIS
     Modifies an existing entitlement in ISC.
@@ -96,18 +96,18 @@ Function Set-ISCEntitlement {
             })
         
         if ($spUserParam.Count -gt 0) {
-            Try {
+            try {
                 $OwnerID = Get-ISCIdentity @spUserParam -ErrorAction Stop | Select-Object -ExpandProperty ID
                 Write-Verbose 'Successfully retrieved user record from Identity Security Cloud.'
             }
-            Catch {
+            catch {
                 Write-Error 'Failed to retrieve user record for specified owner from Identity Security Cloud.'
                 throw $_.Exception
             }
         }
 
         $existingEntitlement = Get-ISCEntitlement -ID $ID
-        $changes = @{}
+        $changes = @()
         if ($DisplayName -and ($DisplayName -ne $existingEntitlement.name)) { $changes += @{ op = 'replace'; path = '/name'; value = "$DisplayName" } }
         if ($Description -and ($Description -ne $existingEntitlement.description)) { $changes += @{ op = 'replace'; path = '/description'; value = "$Description" } }
         if ($OwnerID -and ($OwnerID -ne $existingEntitlement.owner.id)) { $changes += @{ op = 'replace'; path = '/owner'; value = @{ id = $OwnerID; type = 'IDENTITY' } } }
@@ -117,7 +117,7 @@ Function Set-ISCEntitlement {
         if ($RemoveOwner) { $changes += @{ op = 'remove'; path = '/owner' } }
     
         if ($changes.count -ne 0) {
-            Try {
+            try {
                 $body = @( $changes )
                 Write-Verbose 'JSON:'
                 Write-Verbose (ConvertTo-Json $body)
@@ -132,16 +132,16 @@ Function Set-ISCEntitlement {
 
                 $modifiedEntitlement = Invoke-RestMethod @setEntitlementArgs @script:bearerAuthArgs
             }
-            Catch {
+            catch {
                 throw "ERROR: Failed to update $($existingEntitlement.name) at $setEntitlementURL with $($setEntitlementArgs.Body) - $($_.Exception.Message)"
             }
 
-            Return $modifiedEntitlement
+            return $modifiedEntitlement
 
         }
         else {
             Write-Host 'No changes needed.'
-            Return $existingEntitlement
+            return $existingEntitlement
         }
     }
 }
