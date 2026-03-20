@@ -84,72 +84,85 @@ function New-ISCRole {
         throw $_.Exception
     }
 
-    $filters = @()
-
-    if ($ID) {
-        $filters += $(if ($ID.Count -gt 1) { "id in (`"$($ID -join '","')`")" } else { "id eq `"$ID`"" })
-    }
-
-    if ($Name -and $StartsWith) {
-        if ($Name.Count -gt 1) {
-            throw 'StartsWith can only be used with a single Name value.'
+    # Retrieve OwnerID if email or employee number provided
+    $spUserParam = @{}
+    $spUserParam = $(if ($OwnerEmployeeNumber) {
+            @{EmployeeNumber = "$OwnerEmployeeNumber" }
         }
-        $filters += "name sw `"$Name`""
-    }
-    elseif ($Name) {
-        $filters += $(if ($Name.Count -gt 1) { "name in (`"$($Name -join '","')`")" } else { "name eq `"$Name`"" })
-    }
+        elseif ($OwnerEmailAddress) {
+            @{Email = "$OwnerEmailAddress" }
+        }
+    )
 
-    if ($Requestable) {
-        $filters += 'requestable eq true'
-    }
-    elseif ($NotRequestable) {
-        $filters += 'requestable eq false'
-    }
-
-    if ($OwnerId) {
-        $filters += $(if ($OwnerId.Count -gt 1) { "owner.id in (`"$($OwnerId -join '","')`")" } else { "owner.id eq `"$OwnerId`"" })
-    }
-
-    if ($CreatedBefore) {
-        $filters += "created le `"$($CreatedBefore.ToString('yyyy-MM-ddTHH:mm:ssZ'))`""
-    }
-
-    if ($CreatedAfter) {
-        $filters += "created ge `"$($CreatedAfter.ToString('yyyy-MM-ddTHH:mm:ssZ'))`""
-    }
-
-    if ($ModifiedBefore) {
-        $filters += "modified le `"$($ModifiedBefore.ToString('yyyy-MM-ddTHH:mm:ssZ'))`""
-    }
-
-    if ($ModifiedAfter) {
-        $filters += "modified ge `"$($ModifiedAfter.ToString('yyyy-MM-ddTHH:mm:ssZ'))`""
-    }
-
-    $baseURL = "$script:iscAPIurl/v2025/roles?count=true"
-    if ($filters) {
-        $baseURL += "&filters=$($filters -join ' and ')"
-    }
-
-    $roleData = @()
-    do {
-        $url = "$baseURL&offset=$($roleData.count)&limit=$Limit"
-        Write-Verbose "Calling $url"
+    if ($spUserParam.Count -gt 0) {
         try {
-            $response = Invoke-RestMethod -Uri $url -Method Get -ResponseHeadersVariable responseHeaders @script:bearerAuthArgs -MaximumRetryCount 2
-            if ($DebugResponse) {
-                Write-Host $response
-            }
-            $roleData += $response
-            Clear-Variable response
+            $OwnerID = Get-ISCIdentity @spUserParam -ErrorAction Stop | Select-Object -ExpandProperty ID
+            Write-Verbose 'Successfully retrieved user record from Identity Security Cloud.'
         }
         catch {
+            Write-Error 'Failed to retrieve user record for specified owner from Identity Security Cloud.'
             throw $_.Exception
         }
-        Write-Verbose "Retrieved $($roleData.count) of $($responseHeaders.'X-Total-Count') records."
-    } while ($roleData.count -ne $($responseHeaders.'X-Total-Count'))
+    }
 
-    Write-Verbose 'Finished retrieving roles.'
-    return $roleData
+    $body = @{
+        name             = $Name
+        description      = $Description
+        ownerId          = @{
+            id   = $OwnerID
+            type = 'IDENTITY'
+            name = 'Identity'
+        }
+        accessProfileIds = $AccessProfileIds
+        entitlementIds   = $EntitlementIds
+        identityList     = $IdentityList
+        roleCriteria     = $RoleCriteria
+    }
+
+    if ($AccessProfileIds) {
+        $accessProfiles = @()
+        $accessProfiles += foreach ($accessProfileID in $AccessProfileIds) {
+            @{
+                id   = $accessProfileID
+                type = 'ACCESS_PROFILE'
+                name = 'Access Profile'
+            }
+        }
+
+        $body += $accessProfiles
+    }
+
+    if ($EntitlementIds) {
+        $entitlements = @()
+        $entitlements += foreach ($entitlementID in $EntitlementIds) {
+            @{
+                id   = $entitlementID
+                type = 'ENTITLEMENT'
+                name = 'Entitlement'
+            }
+        }
+
+        $body += $entitlements
+    }
+
+    $baseURL = "$script:iscAPIurl/v2025/roles"
+
+    try {
+        Write-Verbose 'JSON:'
+        Write-Verbose (ConvertTo-Json $body)
+
+        $newRoleArgs = @{
+            Uri    = $baseURL
+            Method = 'Post'
+            Body   = (ConvertTo-Json $body)
+        }
+
+        $roleResponse = Invoke-RestMethod @newRoleArgs @script:bearerAuthArgs
+    }
+    catch {
+        throw "ERROR: Failed to create role at $baseURL - $($_.Exception.Message)"
+    }
+
+    Write-Verbose 'Successfully created role.'
+    return $roleResponse
 }

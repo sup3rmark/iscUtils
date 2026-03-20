@@ -1,10 +1,10 @@
-Function Get-ISCIdentity {
+function Get-ISCIdentity {
     <#
 .SYNOPSIS
     Retrieve a specific user from Identity Security Cloud.
 
 .DESCRIPTION
-    Use this tool to retrieve a specific user from Identity Security Cloud by providing the SamAccountName, EmployeeNumber, or Identity Security Cloud ID of the user you want to see. Returns an object.
+    Use this tool to retrieve a specific user from Identity Security Cloud by providing the Email, EmployeeNumber, or Identity Security Cloud ID of the user you want to see. Returns an object.
 
 .INPUTS
     None
@@ -14,7 +14,7 @@ Function Get-ISCIdentity {
     System.Object[] when run with -List flag.
 
 .EXAMPLE
-    PS> Get-ISCIdentity -SamAccountName mc12345
+    PS> Get-ISCIdentity -Email mark.c@company.com
 
 .EXAMPLE
     PS> Get-ISCIdentity -EmployeeNumber 12345
@@ -61,6 +61,14 @@ Function Get-ISCIdentity {
         [ValidateNotNullOrEmpty()]
         [String] $EmployeeNumber,
 
+        # Enter the Email Address of a specific identity to retrieve.
+        [Parameter (
+            Mandatory = $true,
+            ParameterSetName = 'Email'
+        )]
+        [ValidateNotNullOrEmpty()]
+        [String] $Email,
+
         # Enter a custom query.
         [Parameter (
             Mandatory = $true,
@@ -100,8 +108,8 @@ Function Get-ISCIdentity {
             "employeeNumber:$EmployeeNumber"
             break
         }
-        'SamAccountName' {
-            "attributes.samaccountname:$SamAccountName"
+        'Email' {
+            "email:$Email"
             break
         }
         'ID' {

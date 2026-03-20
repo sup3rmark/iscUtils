@@ -58,10 +58,10 @@ function Set-ISCEntitlement {
         [Parameter (Mandatory = $false)]
         [bool] $Privileged,
 
-        # Enter the SamAccountName of the Entitlement owner.
-        [Parameter (Mandatory = $true, ParameterSetName = 'OwnerSamAccountName')]
+        # Enter the Email Address of the Entitlement owner.
+        [Parameter (Mandatory = $true, ParameterSetName = 'OwnerEmail')]
         [ValidateNotNullOrEmpty()]
-        [String] $OwnerSamAccountName,
+        [String] $OwnerEmail,
 
         # Enter the EmployeeNumber of the Entitlement owner.
         [Parameter (Mandatory = $true, ParameterSetName = 'OwnerEmployeeNumber')]
@@ -91,9 +91,10 @@ function Set-ISCEntitlement {
         $spUserParam = $(if ($OwnerEmployeeNumber) {
                 @{EmployeeNumber = "$OwnerEmployeeNumber" }
             }
-            elseif ($OwnerSamAccountName) {
-                @{SamAccountName = "$OwnerSamAccountName" }
-            })
+            elseif ($OwnerEmail) {
+                @{Email = "$OwnerEmail" }
+            }
+        )
         
         if ($spUserParam.Count -gt 0) {
             try {
