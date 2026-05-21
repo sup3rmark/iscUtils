@@ -1,4 +1,4 @@
-Function Invoke-ISCQuery {
+function Invoke-ISCQuery {
     <#
 .SYNOPSIS
     Run a specified query against Identity Security Cloud.
@@ -40,11 +40,11 @@ Function Invoke-ISCQuery {
     begin {}
 
     process {
-        Try {
+        try {
             $spConnection = Test-ISCConnection -ReconnectAutomatically:$ReconnectAutomatically -ErrorAction Stop
             Write-Verbose "Connected to $($spConnection.Tenant) Identity Security Cloud."
         }
-        Catch {
+        catch {
             throw $_.Exception
         }
 
@@ -61,6 +61,7 @@ Function Invoke-ISCQuery {
         Write-Verbose ($body | ConvertTo-Json)
 
         $resultsData = @()
+        $responseData = @()
         do {
             if ($resultsData.count -gt 0) {
                 $queryBody = $body + @{ searchAfter = @( $resultsData[-1].id ) }
@@ -71,16 +72,20 @@ Function Invoke-ISCQuery {
                 $url = "$baseURL`?count=true"
             }
             try {
-                $resultsData += Invoke-RestMethod -Uri $url -Method Post -Body ($queryBody | ConvertTo-Json) -ResponseHeadersVariable responseHeaders @script:bearerAuthArgs
+                $responseData = Invoke-RestMethod -Uri $url -Method Post -Body ($queryBody | ConvertTo-Json) -ResponseHeadersVariable responseHeaders @script:bearerAuthArgs
+                $resultsData += $responseData
             }
             catch {
                 throw $_.Exception
             }
             if ($responseHeaders.'X-Total-Count') { $totalCount = $responseHeaders.'X-Total-Count'[0] }
             Write-Verbose "Retrieved $($resultsData.count) of $totalCount records."
-        } while ($resultsData.count -lt $totalCount)
+        } while ($resultsData.count -lt $totalCount -or $responseData.count -gt 0)
 
         Write-Verbose 'Finished retrieving search results.'
+        if ($resultsData.count -ne $totalCount) {
+            throw "Returned $($resultsData.count) results. Expected $totalCount results. Please try again."
+        }
         return $resultsData
     }
 }
