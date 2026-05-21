@@ -1,4 +1,4 @@
-Function Get-ISCEntitlement {
+function Get-ISCEntitlement {
     <#
 .SYNOPSIS
     Retrieve a specific entitlement from Identity Security Cloud.
@@ -41,8 +41,14 @@ Function Get-ISCEntitlement {
         [ValidateNotNullOrEmpty()]
         [String[]] $Name,
 
-        # Do a StartsWith search using the provided Name value
+        # Specify one or more entitlement values to retrieve
+        [Parameter (Mandatory = $true, ParameterSetName = 'EntitlementValue')]
+        [ValidateNotNullOrEmpty()]
+        [String[]] $Value,
+
+        # Do a StartsWith search using the provided Name or Value value
         [Parameter (Mandatory = $false, ParameterSetName = 'EntitlementName')]
+        [Parameter (Mandatory = $false, ParameterSetName = 'EntitlementValue')]
         [Switch] $StartsWith,
 
         # Retrieves a list of all entitlements from Identity Security Cloud.
@@ -78,7 +84,7 @@ Function Get-ISCEntitlement {
     )
 
     # Dynamically generate the list of Sources we can select from
-    DynamicParam {
+    dynamicparam {
         $sourceAttribute = New-Object System.Management.Automation.ParameterAttribute
         $sourceAttribute.Mandatory = $false
 
@@ -101,11 +107,11 @@ Function Get-ISCEntitlement {
         # A dynamic parameter does not automatically assign a variable to a bound parameter so we're forced to be more explicit.
         if ($PSBoundParameters.Source) { $Source = $PSBoundParameters.Source }
 
-        Try {
+        try {
             $spConnection = Test-ISCConnection -ReconnectAutomatically:$ReconnectAutomatically -ErrorAction Stop
             Write-Verbose "Connected to $($spConnection.Tenant) Identity Security Cloud."
         }
-        Catch {
+        catch {
             throw $_.Exception
         }
 
@@ -128,6 +134,16 @@ Function Get-ISCEntitlement {
         }
         elseif ($Name) {
             $filters += $(if ($Name.Count -gt 1) { "name in (`"$($Name -join '","')`")" } else { "name eq `"$Name`"" })
+        }
+        
+        if ($Value -and $StartsWith) {
+            if ($Value.Count -gt 1) {
+                throw 'StartsWith can only be used with a single Value value.'
+            }
+            $filters += "value sw `"$Value`""
+        }
+        elseif ($Value) {
+            $filters += $(if ($Value.Count -gt 1) { "value in (`"$($Value -join '","')`")" } else { "value eq `"$Value`"" })
         }
 
         if ($Type) {
