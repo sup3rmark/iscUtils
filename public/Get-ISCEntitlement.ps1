@@ -55,10 +55,9 @@ function Get-ISCEntitlement {
         [Parameter (Mandatory = $false, ParameterSetName = 'List')]
         [Switch] $List,
 
-        # Specify one or more types of entitlements to retrieve
-        [Parameter (Mandatory = $false, ParameterSetName = 'Type')]
+        # Specify one or more attributes of entitlements to retrieve
         [ValidateNotNullOrEmpty()]
-        [String[]] $Type,
+        [String[]] $Attribute,
 
         # Filter to only requestable entitlements
         [Parameter (Mandatory = $false, ParameterSetName = 'Requestable')]
@@ -146,8 +145,8 @@ function Get-ISCEntitlement {
             $filters += $(if ($Value.Count -gt 1) { "value in (`"$($Value -join '","')`")" } else { "value eq `"$Value`"" })
         }
 
-        if ($Type) {
-            $filters += $(if ($Type.Count -gt 1) { "type in (`"$($Type -join '","')`")" } else { "type eq `"$Type`"" })
+        if ($Attribute) {
+            $filters += $(if ($Attribute.Count -gt 1) { "attribute in (`"$($Attribute -join '","')`")" } else { "attribute eq `"$Attribute`"" })
         }
 
         if ($Requestable) {
