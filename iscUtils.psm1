@@ -6,4 +6,36 @@ foreach ($import in $allFunctions) {
     . $import.FullName
 }
 
-Export-ModuleMember -Function 'Connect-ISC', 'Get-ISCAccessProfile', 'Get-ISCAccount', 'Get-ISCConnection', 'Get-ISCConnectorRule', 'Get-ISCEntitlement', 'Get-ISCIdentity', 'Get-ISCIdentityAttribute', 'Get-ISCIdentityAttributeList', 'Get-ISCPendingTaskList', 'Get-ISCRole', 'Get-ISCSource', 'Get-ISCSourceSchema', 'Get-ISCTaskList', 'Get-ISCTransform', 'Get-ISCWorkflow', 'Get-ISCWorkflowExecution', 'Get-ISCWorkflowExecutionList', 'Invoke-ISCAccountAggregation', 'Invoke-ISCQuery', 'New-ISCRole', 'New-ISCTenant', 'Remove-ISCTenant', 'Set-ISCAccessProfile', 'Set-ISCEntitlement', 'Set-ISCRole', 'Set-ISCTaskCompleted', 'Test-ISCConnection' -Alias @()
+$functions = @(
+    'Connect-ISC'
+    'Get-ISCAccessProfile'
+    'Get-ISCAccount'
+    'Get-ISCConnection'
+    'Get-ISCConnectorRule'
+    'Get-ISCEntitlement'
+    'Get-ISCIdentity'
+    'Get-ISCIdentityAttribute'
+    'Get-ISCIdentityAttributeList'
+    'Get-ISCPendingTaskList'
+    'Get-ISCRole'
+    'Get-ISCSource'
+    'Get-ISCSourceSchema'
+    'Get-ISCTaskList'
+    'Get-ISCTransform'
+    'Get-ISCWorkflow'
+    'Get-ISCWorkflowExecution'
+    'Get-ISCWorkflowExecutionList'
+    'Invoke-ISCAccountAggregation'
+    'Invoke-ISCQuery'
+    'New-ISCRole'
+    'New-ISCTenant'
+    'Remove-ISCTenant'
+    'Set-ISCAccessProfile'
+    'Set-ISCEntitlement'
+    'Set-ISCIdentityLifecycleState'
+    'Set-ISCRole'
+    'Set-ISCTaskCompleted'
+    'Test-ISCConnection'
+)
+
+Export-ModuleMember -Function $functions -Alias @()
