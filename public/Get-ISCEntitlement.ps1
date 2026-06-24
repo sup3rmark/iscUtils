@@ -104,12 +104,7 @@ function Get-ISCEntitlement {
 
     process {
         # A dynamic parameter does not automatically assign a variable to a bound parameter so we're forced to be more explicit.
-        if ($PSBoundParameters.Source) {
-            $Source = $PSBoundParameters.Source
-        }
-        else {
-            Clear-Variable -Name Source
-        }
+        if ($PSBoundParameters.Source) { $Source = $PSBoundParameters.Source }
 
         try {
             $spConnection = Test-ISCConnection -ReconnectAutomatically:$ReconnectAutomatically -ErrorAction Stop
