@@ -41,6 +41,7 @@ function New-ISCRole {
         [Parameter (Mandatory = $true, ParameterSetName = 'IdentityList-OwnerEmail')]
         [Parameter (Mandatory = $true, ParameterSetName = 'RoleCriteria-OwnerEmail')]
         [Parameter (Mandatory = $true, ParameterSetName = 'RoleCriteriaJSON-OwnerEmail')]
+        [Parameter (Mandatory = $true, ParameterSetName = 'Requestable-OwnerEmail')]
         [ValidateNotNullOrEmpty()]
         [String] $OwnerEmailAddress,
 
@@ -49,6 +50,7 @@ function New-ISCRole {
         [Parameter (Mandatory = $true, ParameterSetName = 'IdentityList-OwnerEmployeeNumber')]
         [Parameter (Mandatory = $true, ParameterSetName = 'RoleCriteria-OwnerEmployeeNumber')]
         [Parameter (Mandatory = $true, ParameterSetName = 'RoleCriteriaJSON-OwnerEmployeeNumber')]
+        [Parameter (Mandatory = $true, ParameterSetName = 'Requestable-OwnerEmployeeNumber')]
         [ValidateNotNullOrEmpty()]
         [String] $OwnerEmployeeNumber,
 
@@ -57,6 +59,7 @@ function New-ISCRole {
         [Parameter (Mandatory = $true, ParameterSetName = 'IdentityList-OwnerID')]
         [Parameter (Mandatory = $true, ParameterSetName = 'RoleCriteria-OwnerID')]
         [Parameter (Mandatory = $true, ParameterSetName = 'RoleCriteriaJSON-OwnerID')]
+        [Parameter (Mandatory = $true, ParameterSetName = 'Requestable-OwnerID')]
         [ValidateNotNullOrEmpty()]
         [String] $OwnerID,
 
@@ -90,6 +93,12 @@ function New-ISCRole {
         [Parameter (Mandatory = $true, ParameterSetName = 'RoleCriteriaJSON-OwnerID')]
         [ValidateNotNullOrEmpty()]
         [Object[]] $RoleCriteriaJSON,
+
+        # Select that the Role should be requestable.
+        [Parameter (Mandatory = $true, ParameterSetName = 'Requestable-OwnerEmail')]
+        [Parameter (Mandatory = $true, ParameterSetName = 'Requestable-OwnerEmployeeNumber')]
+        [Parameter (Mandatory = $true, ParameterSetName = 'Requestable-OwnerID')]
+        [Switch] $Requestable,
 
         # Specifies whether to output the API response directly to the console for debugging.
         [Parameter (Mandatory = $false)]
